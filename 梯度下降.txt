@@ -1,0 +1,69 @@
+
+clc,clear;
+format long;
+
+vol =100 ;
+dim = 2;
+x = zeros(vol,dim);
+f = zeros(1,vol);
+dfmin = 0.00000001;
+a= 0.02;
+b=40;
+c=[ 0 0;0 0];
+d=[ 0;0];
+x(1,:) =[2 2];
+x(2,:) =[1 0.5];
+
+f(1) = testfunc( x(1,:),c,d,b );
+f(2) = testfunc( x(2,:),c,d,b );
+k=1;
+p=parpool(4);
+parfor m=1:dim
+xx=x(k,:);
+xx(m)=x(k+1,m);
+df(m) =  testfunc( xx,c,d,b)-testfunc( x(k,:),c,d,b) )/( x(k+1,m)-x(k,m) ;
+end 
+delete(p);
+
+%迭代主体 
+k=2;
+while (norm(df) > dfmin) & (k<vol)
+x(k+1,:)=x(k,:) - a*df;
+f(k+1) = testfunc( x(k+1,:),c,d,b );
+
+p=parpool(4);
+parfor m=1:dim
+xx=x(k,:);
+xx(m)=x(k+1,m);
+df(m) =  testfunc( xx,c,d,b)-testfunc( x(k,:),c,d,b) )/( x(k+1,m)-x(k,m) ;
+end 
+delete(p);
+
+k=k+1;
+end
+
+%结果
+disp(min(f));
+
+plot(f);
+
+
+%测试函数
+function value = testfunc(x,c,d,b)
+
+x_1 = x(1);
+x_2 = x(2);
+xx= x.';
+cc=c;
+dd=d;
+bb=b;
+
+value_0 = x_1^2+x_2^2+1;
+
+punishm=cc*xx-dd;
+punishm(punishm<0)=0;
+value = value_0+bb*sum(punishm);
+
+end
+
+

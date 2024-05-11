@@ -1,0 +1,59 @@
+%vol数据容量 dim维度 x自变量 f适应度函数 dfmin迭代终止 df适应度变化 a学习率 
+%b惩罚率  限制表达式：c*x^T<=d
+%梯度下降 一维
+
+clc,clear;
+format long;
+
+vol =100 ;
+dim = 1;
+x = zeros(vol,dim);
+f = zeros(1,vol);
+dfmin = 0.00000001;
+a= 0.05;
+b=40;
+c=-1;
+d=-1;
+x(1,:) =[2];
+x(2,:) =[0.25];
+
+f(1) = testfunc( x(1,:) )+b*punishfunc( x(1,:),c,d);
+f(2) = testfunc( x(2,:) )+b*punishfunc( x(2,:),c,d);
+df= (f(2)-f(1)) * [1/( x(2,1)-x(1,1) )];
+
+%迭代主体
+k=2;
+while (norm(df) > dfmin) & (k<vol)
+x(k+1,:)=x(k,:) - a*df;
+f(k+1) = testfunc( x(k+1,:) )+b*punishfunc( x(k+1,:),c,d);
+df=(f(k+1)-f(k)) * [1/( x(k+1,1)-x(k,1) )];
+k=k+1;
+end
+
+%结果
+disp(min(f));
+
+plot(f);
+
+
+%测试函数
+function value = testfunc(x)
+
+xx = x;
+
+value = xx^2+1;
+
+end
+
+%惩罚函数
+function punish = punishfunc(x,c,d)
+
+xx= x.';
+cc=c;
+dd=d;
+
+punishm=cc*xx-dd;
+punishm(punishm<0)=0;
+punish = sum(punishm);
+
+end
