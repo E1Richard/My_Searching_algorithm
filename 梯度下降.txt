@@ -1,4 +1,4 @@
-
+#自变量为向量
 clc,clear;
 format long;
 
