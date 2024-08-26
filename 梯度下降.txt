@@ -1,7 +1,8 @@
-#自变量为向量--
+%自变量为向量
 clc,clear;
 format long;
 
+%设置
 vol =100 ;
 dim = 2;
 x = zeros(vol,dim);
@@ -14,16 +15,17 @@ d=[ 0;0];
 x(1,:) =[2 2];
 x(2,:) =[1 0.5];
 
+%初始化
 f(1) = testfunc( x(1,:),c,d,b );
 f(2) = testfunc( x(2,:),c,d,b );
 k=1;
-p=parpool(4);
-parfor m=1:dim
 xx=x(k,:);
+for m=1:dim
 xx(m)=x(k+1,m);
-df(m) =  testfunc( xx,c,d,b)-testfunc( x(k,:),c,d,b) )/( x(k+1,m)-x(k,m) ;
+%适应度函数
+df(m) =  (testfunc( xx,c,d,b)-testfunc( x(k,:),c,d,b))/( x(k+1,m)-x(k,m)) ;
+xx(m)=x(k,m);
 end 
-delete(p);
 
 %迭代主体 
 k=2;
@@ -31,13 +33,13 @@ while (norm(df) > dfmin) & (k<vol)
 x(k+1,:)=x(k,:) - a*df;
 f(k+1) = testfunc( x(k+1,:),c,d,b );
 
-p=parpool(4);
-parfor m=1:dim
 xx=x(k,:);
+for m=1:dim
 xx(m)=x(k+1,m);
-df(m) =  testfunc( xx,c,d,b)-testfunc( x(k,:),c,d,b) )/( x(k+1,m)-x(k,m) ;
+%适应度函数
+df(m) = (testfunc( xx,c,d,b)-testfunc( x(k,:),c,d,b))/( x(k+1,m)-x(k,m));
+xx(m)=x(k,m);
 end 
-delete(p);
 
 k=k+1;
 end
@@ -48,7 +50,7 @@ disp(min(f));
 plot(f);
 
 
-%测试函数
+%测试函数与惩罚函数
 function value = testfunc(x,c,d,b)
 
 x_1 = x(1);
